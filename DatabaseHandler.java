@@ -1,3 +1,4 @@
+import java.sql.ResultSet;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -161,4 +162,95 @@ public class DatabaseHandler {
 
         return comments;
     }
+
+    // Soft delete a user
+    public static void softDeleteUser(int userId) {
+        String softDeleteUserSQL = "UPDATE User SET is_deleted = TRUE WHERE user_id = ?";
+
+        try (Connection connection = establishConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(softDeleteUserSQL)) {
+
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "An error occurred while soft-deleting a user", e);
+            throw new DatabaseException("Error soft-deleting user", e);
+        }
+    }
+
+    // Restore a soft-deleted user
+    public static void restoreUser(int userId) {
+        String restoreUserSQL = "UPDATE User SET is_deleted = FALSE WHERE user_id = ?";
+
+        try (Connection connection = establishConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(restoreUserSQL)) {
+
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "An error occurred while restoring a user", e);
+            throw new DatabaseException("Error restoring user", e);
+        }
+    }
+
+    // Hard delete a user (this will permanently remove the user, use with caution!)
+    public static void hardDeleteUser(int userId) {
+        String hardDeleteUserSQL = "DELETE FROM User WHERE user_id = ? AND is_deleted = TRUE";
+
+        try (Connection connection = establishConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(hardDeleteUserSQL)) {
+
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "An error occurred while hard-deleting a user", e);
+            throw new DatabaseException("Error hard-deleting user", e);
+        }
+    }
+// Soft delete a project
+public static void softDeleteProject(int projectId) {
+    String softDeleteProjectSQL = "UPDATE Project SET is_deleted = TRUE WHERE project_id = ?";
+
+    try (Connection connection = establishConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(softDeleteProjectSQL)) {
+
+        preparedStatement.setInt(1, projectId);
+        preparedStatement.executeUpdate();
+    } catch (SQLException e) {
+        logger.log(Level.SEVERE, "An error occurred while soft-deleting a project", e);
+        throw new DatabaseException("Error soft-deleting project", e);
+    }
+}
+
+// Soft delete a report
+public static void softDeleteReport(int reportId) {
+    String softDeleteReportSQL = "UPDATE Report SET is_deleted = TRUE WHERE report_id = ?";
+
+    try (Connection connection = establishConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(softDeleteReportSQL)) {
+
+        preparedStatement.setInt(1, reportId);
+        preparedStatement.executeUpdate();
+    } catch (SQLException e) {
+        logger.log(Level.SEVERE, "An error occurred while soft-deleting a report", e);
+        throw new DatabaseException("Error soft-deleting report", e);
+    }
+}
+
+// Soft delete a comment
+public static void softDeleteComment(int commentId) {
+    String softDeleteCommentSQL = "UPDATE Comment SET is_deleted = TRUE WHERE comment_id = ?";
+
+    try (Connection connection = establishConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(softDeleteCommentSQL)) {
+
+        preparedStatement.setInt(1, commentId);
+        preparedStatement.executeUpdate();
+    } catch (SQLException e) {
+        logger.log(Level.SEVERE, "An error occurred while soft-deleting a comment", e);
+        throw new DatabaseException("Error soft-deleting comment", e);
+    }
+}
+
+
 }
